@@ -37,10 +37,9 @@ jobs:
       - name: Install Node dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Validate web app JavaScript
+      - name: Validate embedded web app JavaScript
         run: |
-          test -f www/index.html
-          node --check www/app.js || true
+          node -e "const fs=require('fs'); const vm=require('vm'); const html=fs.readFileSync('www/index.html','utf8'); const scripts=[...html.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)]; if(!scripts.length) throw new Error('No app script found'); scripts.forEach(s=>new vm.Script(s[1]));"
 
       - name: Generate Android project
         run: npx cap add android
