@@ -13,7 +13,7 @@ This repository builds a **debug-signed APK for direct Android installation**. I
 - JSON backup and restore. Backup metadata intentionally excludes the local account PIN.
 - Android back navigation through the in-app page history.
 
-The app's web source and Node tests are kept in `SEVA_Hardware_Project_Source.tar.gz`; the build workflow extracts them before testing and packaging.
+The app's web source and Node tests are stored as a compressed source bundle in the hidden `.source-bundle` parts. The build workflow reassembles the bundle automatically before testing and packaging.
 
 ## Build and download the APK
 
