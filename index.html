@@ -1,157 +1,22 @@
 <!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#14264f"><title>Seva Hardware Business Manager</title>
-<link rel="manifest" href="manifest.json"><link rel="stylesheet" href="style.css">
-</head><body>
-
-<div id="authScreen" class="auth-screen hidden">
-  <div class="auth-card">
-    <div class="logo">SH</div>
-    <h1>Seva Hardware</h1>
-    <p>Offline Business Manager</p>
-    <label>Mobile number<input id="authPhone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile number"></label>
-    <label>Business name (new account)<input id="authBusiness" placeholder="Seva Hardware"></label>
-    <label>4–6 digit PIN<input id="authPin" type="password" inputmode="numeric" maxlength="6" placeholder="Create PIN / Enter PIN"></label>
-    <button class="primary wide" id="authLogin">Login</button>
-    <button class="secondary wide" id="authCreate">Create new local account</button>
-    <small id="authMessage"></small>
-    <p class="auth-note">Offline local account: no OTP or cloud. Your data stays on this device. Keep a backup file safe.</p>
-  </div>
-</div>
-
-<div id="lockScreen" class="lock-screen hidden">
-  <div class="lock-card"><div class="logo">SH</div><h2>Seva Hardware</h2><p>Enter your app PIN</p>
-  <input id="pinEntry" type="password" inputmode="numeric" maxlength="6" placeholder="Enter PIN">
-  <button class="primary wide" id="unlockBtn">Unlock</button><small id="pinError"></small></div>
-</div>
-<header class="topbar"><div><b id="topBusiness">Seva Hardware</b><small>Private · Offline Business Manager</small></div><button id="quickBackup" class="ghost">Backup ↓</button></header>
-<main>
-<section class="page active" id="home">
- <div class="page-title"><div><small>BUSINESS OVERVIEW</small><h1>Dashboard</h1><p id="dateToday"></p></div><div class="rupee">₹</div></div>
- <div class="stats">
-  <div class="stat"><small>Today's Sales</small><b id="todaySales">₹0</b></div>
-  <div class="stat"><small>Receivable</small><b id="receivable">₹0</b></div>
-  <div class="stat"><small>Payable</small><b id="payable">₹0</b></div>
-  <div class="stat"><small>Low Stock Items</small><b id="lowStock">0</b></div>
- </div>
- <button class="primary wide" data-page="billing">＋ Create Sale Bill</button>
- <div class="tiles">
-  <button data-page="products">📦<span>Products & Stock</span></button><button data-page="parties">👥<span>Parties / Khata</span></button>
-  <button data-page="purchase">🧾<span>Purchase</span></button><button data-page="expenses">💸<span>Expenses</span></button>
-  <button data-page="history">📚<span>Bill History</span></button><button data-page="reports">📊<span>Reports</span></button>
- </div>
- <h3>Recent transactions</h3><div id="recentList" class="panel empty">No transactions yet.</div>
-</section>
-
-<section class="page" id="billing">
- <div class="page-title"><div><small>SALES</small><h1>Create Invoice</h1></div><span class="tag">New bill</span></div>
- <div class="panel grid2">
-  <label>Invoice type<select id="saleType"><option value="cash">Cash Bill</option><option value="credit">Credit Bill</option><option value="return">Sale Return</option></select></label>
-  <label>Invoice date<input type="date" id="saleDate"></label>
-  <label class="span2">Customer<input id="saleParty" list="partyHints" placeholder="Customer name"><datalist id="partyHints"></datalist></label>
-  <label>Phone<input id="salePhone" inputmode="tel" placeholder="Optional"></label>
-  <label>Payment mode<select id="saleMode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Card</option><option>Other</option></select></label>
-  <label>GST treatment<select id="taxMode"><option value="gst">GST Invoice</option><option value="none">Non-GST / Bill of Supply</option></select></label>
-  <label>Place of supply<select id="supplyType"><option value="intra">Within Maharashtra (CGST + SGST)</option><option value="inter">Outside Maharashtra (IGST)</option></select></label>
- </div>
- <div class="section-row"><h3>Items</h3><button class="link" id="addSaleLine">＋ Add item</button></div>
- <div id="saleLines"></div>
- <div class="panel">
-  <div class="grid2">
-   <label>Bill discount type<select id="saleDiscType"><option value="amount">Amount ₹</option><option value="percent">Percent %</option></select></label>
-   <label>Discount<input type="number" id="saleDisc" min="0" value="0"></label>
-  </div>
-  <div class="totals"><div><span>Taxable subtotal</span><b id="saleSub">₹0.00</b></div><div><span>Discount</span><b id="saleDiscOut">₹0.00</b></div><div><span>GST</span><b id="saleTax">₹0.00</b></div><div class="grand"><span>Grand total</span><b id="saleGrand">₹0.00</b></div><div><span>Balance due</span><b id="saleDue">₹0.00</b></div></div>
-  <label>Amount received<input id="salePaid" type="number" min="0" value="0"></label>
-  <label>Notes<textarea id="saleNotes" rows="2" placeholder="Optional"></textarea></label>
- </div>
- <button class="primary wide" id="saveSale">Save Invoice</button><p class="muted">GST rates are editable per product. Confirm HSN, tax rate and invoice compliance with your accountant before issuing tax invoices.</p>
-</section>
-
-<section class="page" id="products">
- <div class="page-title"><div><small>INVENTORY</small><h1>Products & Stock</h1></div><button class="primary" id="newProduct">＋ Add</button></div>
- <input class="search" id="productSearch" placeholder="Search name / HSN">
- <div id="productList" class="panel"></div>
-</section>
-
-<section class="page" id="parties">
- <div class="page-title"><div><small>CUSTOMERS & SUPPLIERS</small><h1>Parties / Khata</h1></div><button class="primary" id="newParty">＋ Add</button></div>
- <input class="search" id="partySearch" placeholder="Search party">
- <div id="partyList" class="panel"></div>
- <h3>Record payment / receipt</h3>
- <div class="panel grid2">
-  <label>Party<select id="paymentParty"></select></label><label>Entry type<select id="paymentType"><option value="receipt">Money received</option><option value="payment">Money paid</option></select></label>
-  <label>Amount ₹<input type="number" id="paymentAmount" min="0" step=".01"></label><label>Mode<select id="paymentMode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Card</option><option>Other</option></select></label>
-  <label class="span2">Date<input type="date" id="paymentDate"></label>
-  <button class="primary span2" id="savePayment">Save Entry</button>
- </div>
- <div id="paymentHistory" class="panel"></div>
-</section>
-
-<section class="page" id="purchase">
- <div class="page-title"><div><small>INWARD STOCK</small><h1>Purchase Entry</h1></div></div>
- <div class="panel grid2">
-  <label>Supplier<input id="purchaseParty" list="supplierHints" placeholder="Supplier name"><datalist id="supplierHints"></datalist></label>
-  <label>Date<input type="date" id="purchaseDate"></label>
-  <label>Bill / Invoice No.<input id="purchaseRef" placeholder="Supplier bill number"></label>
-  <label>GST treatment<select id="purchaseTaxMode"><option value="gst">GST Purchase</option><option value="none">Non-GST Purchase</option></select></label>
- </div>
- <div class="section-row"><h3>Purchased items</h3><button class="link" id="addPurchaseLine">＋ Add item</button></div>
- <div id="purchaseLines"></div>
- <div class="panel"><div class="totals"><div><span>Purchase subtotal</span><b id="purchaseSub">₹0.00</b></div><div><span>GST</span><b id="purchaseTax">₹0.00</b></div><div class="grand"><span>Total</span><b id="purchaseTotal">₹0.00</b></div></div><label>Amount paid<input type="number" id="purchasePaid" value="0" min="0"></label></div>
- <button class="primary wide" id="savePurchase">Save Purchase & Add Stock</button>
- <div id="purchaseHistory" class="panel"></div>
-</section>
-
-<section class="page" id="expenses">
- <div class="page-title"><div><small>OUTGOINGS</small><h1>Expenses</h1></div></div>
- <div class="panel grid2">
-  <label>Expense category<select id="expenseCategory"><option>Rent</option><option>Electricity</option><option>Transport</option><option>Salary</option><option>Tea / Food</option><option>Repairs</option><option>Other</option></select></label>
-  <label>Date<input id="expenseDate" type="date"></label>
-  <label>Amount ₹<input id="expenseAmount" type="number" min="0" step=".01"></label>
-  <label>Payment mode<select id="expenseMode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Card</option></select></label>
-  <label class="span2">Description<input id="expenseNote" placeholder="Expense details"></label>
-  <button class="primary span2" id="saveExpense">Save Expense</button>
- </div><div id="expenseList" class="panel"></div>
-</section>
-
-<section class="page" id="history">
- <div class="page-title"><div><small>TRANSACTIONS</small><h1>Bill History</h1></div></div>
- <input class="search" id="historySearch" placeholder="Search invoice / customer">
- <div id="historyList" class="panel"></div>
-</section>
-
-<section class="page" id="reports">
- <div class="page-title"><div><small>BUSINESS PERFORMANCE</small><h1>Reports</h1></div></div>
- <div class="panel">
-  <label>Period<select id="reportPeriod"><option value="today">Today</option><option value="month" selected>This month</option><option value="year">This year</option><option value="all">All time</option></select></label>
-  <div class="report-grid"><div><small>Net Sales</small><b id="rSales">₹0</b></div><div><small>GST Collected (summary)</small><b id="rTax">₹0</b></div><div><small>Purchases</small><b id="rPurchase">₹0</b></div><div><small>Expenses</small><b id="rExpense">₹0</b></div><div><small>Receipts</small><b id="rReceipt">₹0</b></div><div><small>Payments</small><b id="rPayment">₹0</b></div></div>
-  <div class="grand totals"><span>Indicative operating surplus*</span><b id="rSurplus">₹0</b></div>
-  <small class="muted">*Simple sales − purchase − expense summary; not a statutory Profit & Loss or GST return.</small>
- </div>
- <button class="secondary wide" id="exportCSV">Export transactions CSV</button>
-</section>
-
-<section class="page" id="settings">
- <div class="page-title"><div><small>YOUR APP</small><h1>Settings & Backup</h1></div></div>
- <div class="panel">
-  <label>Business name<input id="setName" value="Seva Hardware"></label><label>GSTIN<input id="setGstin" placeholder="15-character GSTIN"></label>
-  <label>State<input id="setState" value="Maharashtra"></label><label>Business phone<input id="setPhone"></label><label>Address<textarea id="setAddress" rows="2"></textarea></label>
-  <button class="primary wide" id="saveSettings">Save business details</button>
- </div>
- <div class="panel">
-  <h3>Account PIN</h3><p class="muted">Change the PIN used for your local mobile-number account.</p>
-  <label>New 4–6 digit PIN<input id="changeAccountPin" type="password" inputmode="numeric" maxlength="6" placeholder="New PIN"></label>
-  <button class="secondary wide" id="changePinBtn">Change account PIN</button>
- </div>
- <div class="panel"><h3>Backup & Restore</h3><p class="muted">Back up your data regularly. Restore replaces current app data.</p><button class="secondary wide" id="backupBtn">Download full backup</button><label class="file-label">Restore backup<input type="file" id="restoreFile" accept="application/json"></label><button class="danger wide" id="resetData">Delete all app data</button></div>
- <div class="panel"><h3>Privacy</h3><p class="muted">This app stores data locally in this browser on this phone. No account or cloud server is used. Data is not encrypted in this version. Keep your phone locked and backup files private. Avoid clearing browser storage.</p></div>
-</section>
-</main>
-<nav class="bottom-nav">
- <button class="active" data-page="home">⌂<small>Home</small></button><button data-page="billing">＋<small>Billing</small></button><button data-page="products">▦<small>Stock</small></button><button data-page="parties">♙<small>Parties</small></button><button data-page="settings">☰<small>More</small></button>
-</nav>
-<div id="toast" class="toast"></div><dialog id="modal"><div id="modalBody"></div><button class="secondary wide" id="modalClose">Close</button></dialog>
-<script src="app.js"></script>
-</body></html>
+<html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#14264f"><title>Seva Hardware</title><link rel="manifest" href="manifest.json"><style>
+*{box-sizing:border-box}body{margin:0;background:#f3f5fa;color:#17233d;font:15px system-ui,Arial}.hero{background:#14264f;color:#fff;padding:22px 18px 28px;border-radius:0 0 22px 22px}.hero h1{margin:5px 0}.wrap{max-width:760px;margin:auto;padding:15px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:-9px}.card{background:#fff;border-radius:15px;padding:15px;box-shadow:0 3px 14px #14264f12}.muted{color:#69758c;font-size:13px}.num{font-size:22px;font-weight:750;margin-top:6px}.tabs{display:flex;gap:8px;overflow:auto;margin:16px 0}.tabs button,.btn{border:0;border-radius:10px;padding:11px 14px;background:#e8edfa;color:#14264f;font-weight:650;white-space:nowrap}.tabs button.active,.primary{background:#245bd6;color:#fff}.panel{display:none}.panel.active{display:block}.field{display:grid;gap:5px;margin:10px 0}.field input,.field select{width:100%;padding:12px;border:1px solid #dce2ee;border-radius:10px;font:inherit;background:white}.btn{cursor:pointer}.primary{width:100%;margin-top:8px}.list{margin-top:12px}.item{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #edf0f5}.danger{background:#ffeded;color:#a21d1d}.note{margin-top:14px;padding:12px;background:#fff5d9;border-radius:12px;font-size:13px}
+</style></head><body><header class="hero"><small>OFFLINE BUSINESS MANAGER</small><h1>Seva Hardware</h1><div>Namaste! Aapka business dashboard</div></header><main class="wrap">
+<div class="stats"><div class="card"><div class="muted">Total Sales</div><div class="num" id="salesTotal">₹0.00</div></div><div class="card"><div class="muted">Transactions</div><div class="num" id="saleCount">0</div></div><div class="card"><div class="muted">Stock Items</div><div class="num" id="stockCount">0</div></div><div class="card"><div class="muted">Customers</div><div class="num" id="customerCount">0</div></div></div>
+<nav class="tabs"><button class="active" data-tab="dashboard">Dashboard</button><button data-tab="sale">New Sale</button><button data-tab="stock">Stock</button><button data-tab="customers">Customers</button><button data-tab="history">Sales History</button></nav>
+<section id="dashboard" class="panel active"><div class="card"><b>Welcome to Seva Hardware</b><p class="muted">Phone par billing aur stock ka simple offline manager.</p><p class="muted">Menu se sale add karein, stock aur customers manage karein.</p></div></section>
+<section id="sale" class="panel"><div class="card"><h3>New Sale / बिल</h3><form id="saleForm"><label class="field">Customer name<input id="saleCustomer" placeholder="Walk-in Customer"></label><label class="field">Item / Product<input id="saleItem" required placeholder="Cement, Pipe, etc."></label><label class="field">Quantity<input id="saleQty" type="number" min="1" value="1" required></label><label class="field">Rate (₹)<input id="saleRate" type="number" min="0" step=".01" required placeholder="0.00"></label><button class="btn primary">Save Sale</button></form></div></section>
+<section id="stock" class="panel"><div class="card"><h3>Add Stock Item</h3><form id="stockForm"><label class="field">Product name<input id="stockName" required></label><label class="field">Quantity<input id="stockQty" type="number" min="0" required></label><label class="field">Selling rate (₹)<input id="stockRate" type="number" min="0" step=".01" required></label><button class="btn primary">Add / Update Stock</button></form><div id="stockList" class="list"></div></div></section>
+<section id="customers" class="panel"><div class="card"><h3>Add Customer</h3><form id="customerForm"><label class="field">Customer name<input id="customerName" required></label><label class="field">Mobile number<input id="customerPhone" inputmode="numeric"></label><button class="btn primary">Save Customer</button></form><div id="customerList" class="list"></div></div></section>
+<section id="history" class="panel"><div class="card"><h3>Sales History</h3><div id="historyList" class="list"></div><button class="btn" onclick="window.print()">Print / Save PDF</button></div></section>
+<div class="note"><b>Important:</b> Data is saved only in this browser on this phone. Is version mein cloud sync, multi-branch login aur online backup nahi hai. Browser data clear karne se records delete ho sakte hain. Regular backup zaroor rakhein.</div></main>
+<script>
+const get=k=>JSON.parse(localStorage.getItem('seva_'+k)||'[]');const put=(k,v)=>{localStorage.setItem('seva_'+k,JSON.stringify(v));render()};const money=n=>'₹'+Number(n||0).toFixed(2);
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id===b.dataset.tab))}));
+document.getElementById('saleForm').addEventListener('submit',e=>{e.preventDefault();const q=+saleQty.value,r=+saleRate.value;const a=get('sales');a.unshift({id:Date.now(),customer:saleCustomer.value||'Walk-in Customer',item:saleItem.value,qty:q,rate:r,total:q*r,date:new Date().toLocaleString('en-IN')});put('sales',a);e.target.reset();saleQty.value=1;alert('Sale saved on this phone')});
+document.getElementById('stockForm').addEventListener('submit',e=>{e.preventDefault();const a=get('stock'),n=stockName.value.trim(),i=a.findIndex(x=>x.name.toLowerCase()===n.toLowerCase()),v={name:n,qty:+stockQty.value,rate:+stockRate.value};if(i>=0)a[i]=v;else a.push(v);put('stock',a);e.target.reset()});
+document.getElementById('customerForm').addEventListener('submit',e=>{e.preventDefault();const a=get('customers');a.push({name:customerName.value.trim(),phone:customerPhone.value});put('customers',a);e.target.reset()});
+function render(){const s=get('sales'),st=get('stock'),c=get('customers');salesTotal.textContent=money(s.reduce((t,x)=>t+x.total,0));saleCount.textContent=s.length;stockCount.textContent=st.length;customerCount.textContent=c.length;stockList.innerHTML=st.map(x=>'<div class="item"><span>'+esc(x.name)+'<br><small class="muted">'+x.qty+' pcs</small></span><b>'+money(x.rate)+'</b></div>').join('')||'<p class="muted">No stock added</p>';customerList.innerHTML=c.map(x=>'<div class="item"><span>'+esc(x.name)+'</span><span class="muted">'+esc(x.phone)+'</span></div>').join('')||'<p class="muted">No customers added</p>';historyList.innerHTML=s.map(x=>'<div class="item"><span>'+esc(x.item)+'<br><small class="muted">'+esc(x.customer)+' · '+esc(x.date)+'</small></span><b>'+money(x.total)+'</b></div>').join('')||'<p class="muted">No sales yet</p>'}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}render();
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script></body></html>
