@@ -45,6 +45,7 @@ jobs:
       - name: Reassemble app source and tests
         run: |
           cat .source-bundle/part-*.b64 | base64 --decode | tar -xz
+          node scripts/apply-app-updates.js
 
       - name: Install Node dependencies
         run: npm install --no-audit --no-fund
