@@ -1,17 +1,19 @@
 {
-  "name": "seva-hardware-android",
-  "version": "1.0.0",
+  "name": "seva-hardware-business-manager",
+  "version": "1.1.0",
   "private": true,
-  "description": "SEVA Hardware offline-first Android billing app",
+  "description": "Offline-first SEVA Hardware billing and business management Android app",
   "scripts": {
-    "android:add": "cap add android",
-    "android:sync": "cap sync android"
+    "test": "node --test tests/*.test.js",
+    "android:add": "npx cap add android",
+    "android:sync": "npx cap sync android",
+    "android:build:debug": "cd android && ./gradlew assembleDebug"
   },
   "dependencies": {
-    "@capacitor/android": "^7.4.3",
-    "@capacitor/core": "^7.4.3"
+    "@capacitor/android": "7.4.3",
+    "@capacitor/core": "7.4.3"
   },
   "devDependencies": {
-    "@capacitor/cli": "^7.4.3"
+    "@capacitor/cli": "7.4.3"
   }
 }

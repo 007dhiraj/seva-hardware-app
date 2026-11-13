@@ -1,4 +1,4 @@
-name: Build SEVA Hardware Android APK
+name: Build SEVA Hardware installable APK
 
 on:
   workflow_dispatch:
@@ -8,9 +8,14 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: seva-hardware-apk-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -26,20 +31,40 @@ jobs:
           distribution: temurin
           java-version: '21'
 
+      # Do not request the obsolete SDK package named "tools".
       - name: Set up Android command-line tools
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
-      - name: Install Android SDK packages
+      - name: Install Android SDK platform and build tools
         run: |
           yes | sdkmanager --licenses
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          sdkmanager --install "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Extract app source and tests
+        run: tar -xzf SEVA_Hardware_Project_Source.tar.gz
 
       - name: Install Node dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Validate embedded web app JavaScript
+      - name: Run business logic and asset tests
+        run: npm test
+
+      - name: Validate app assets and JavaScript
         run: |
-          node -e "const fs=require('fs'); const vm=require('vm'); const html=fs.readFileSync('www/index.html','utf8'); const scripts=[...html.matchAll(/<script>([\\s\\S]*?)<\\/script>/g)]; if(!scripts.length) throw new Error('No app script found'); scripts.forEach(s=>new vm.Script(s[1]));"
+          node --check www/business-core.js
+          node --check www/app.js
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const html = fs.readFileSync('www/index.html', 'utf8');
+          for (const asset of ['style.css', 'manifest.json', 'business-core.js', 'app.js']) {
+            if (!html.includes(asset) || !fs.existsSync(`www/${asset}`)) throw new Error(`Missing app asset: ${asset}`);
+          }
+          for (const id of ['activeAccountLabel', 'logoutBtn', 'salePaidLabel', 'saleTaxable']) {
+            if (!html.includes(`id="${id}"`)) throw new Error(`Missing required UI element: ${id}`);
+          }
+          NODE
 
       - name: Generate Android project
         run: npx cap add android
@@ -53,10 +78,30 @@ jobs:
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace assembleDebug
 
-      - name: Verify APK exists
-        run: test -s android/app/build/outputs/apk/debug/app-debug.apk
+      - name: Verify APK package and checksum
+        run: |
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.sevahardware.businessmanager'"
+          sha256sum "$APK"
+          stat -c 'APK size: %s bytes' "$APK"
 
-      - name: Upload installable APK
+      - name: Install and launch APK on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          disable-animations: true
+          script: |
+            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+            adb shell monkey -p com.sevahardware.businessmanager 1
+            sleep 10
+            adb shell pidof com.sevahardware.businessmanager
+            if adb logcat -d -t 2500 | grep -E 'FATAL EXCEPTION|Process: com.sevahardware.businessmanager'; then exit 1; fi
+
+      - name: Upload directly installable debug APK
         uses: actions/upload-artifact@v4
         with:
           name: SEVA-Hardware-Android-APK

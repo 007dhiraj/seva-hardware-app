@@ -1,16 +1,16 @@
-SEVA HARDWARE APK — PHONE SE CLOUD BUILD
+SEVA HARDWARE — ANDROID APK
 
-Is ZIP mein GitHub Actions workflow add kiya gaya hai. APK cloud mein build hoga; phone par Android Studio ki zaroorat nahi.
+यह project GitHub Actions से सीधे install होने वाली debug APK बनाता है। Play Store/AAB नहीं बनता।
 
-Zaroori baat: Is ChatGPT environment mein internet/Android SDK access nahi hai, isliye main yahin APK compile karke attach nahi kar sakta. Neeche diye steps aap apne Android phone ke Chrome se kar sakte hain.
+APK लेने के steps:
+1. GitHub repository खोलें: 007dhiraj/seva-hardware-app
+2. Actions tab खोलें।
+3. “Build SEVA Hardware installable APK” workflow चुनें।
+4. Run workflow दबाएँ और green/success run पूरा होने दें।
+5. सफल run खोलें और नीचे Artifacts में SEVA-Hardware-Android-APK डाउनलोड करें।
+6. ZIP extract करें, app-debug.apk पर tap करें। Android पूछे तो Chrome/Files के लिए Install unknown apps की अनुमति दें।
+7. App खोलकर अपना mobile number और 4–6 digit local PIN बनाएं।
 
-1. GitHub.com par account banayein ya login karein.
-2. New repository banayein. Naam: seva-hardware-app. Public ya Private aapki choice.
-3. ZIP ko phone mein extract karein.
-4. Extracted folder ke andar seva_hardware_android_app folder ke sabhi files/folders (including .github) repository ke root mein upload karein. GitHub website par Add file > Upload files use karein. Hidden .github folder upload na ho to GitHub web editor se workflow file banani hogi: .github/workflows/android-apk.yml; is ZIP ke same naam wali file ka content copy karein.
-5. Upload ke baad Commit changes karein.
-6. Repository mein Actions tab kholein. “Build SEVA Hardware APK” workflow select karein. Agar automatic run na hua ho to Run workflow dabayein.
-7. Build complete hone par run ke neeche Artifacts section mein “SEVA-Hardware-APK” download karein.
-8. ZIP artifact ko phone mein extract karein. app-debug.apk par tap karke install karein. Android agar permission maange to Chrome/Files ke liye “Install unknown apps” allow karein.
+Backup: App में More → Settings & Backup → Download full backup चुनें। Android share sheet में Files/Drive पर JSON backup सुरक्षित रखें। Restore backup में वही JSON file चुनें। Restore मौजूदा account data replace करता है।
 
-Security: APK debug-signed hogi, Play Store release ke liye nahi. Is project ka local data phone par hi rahega; app uninstall/data clear karne se data ja sakta hai. Regular backup rakhein.
+जरूरी सीमा: अभी data इसी फोन में रहता है। Cloud database, multi-branch login और automatic sync नहीं हैं। OTP नहीं है और data encryption नहीं है। App uninstall या app data clear करने से data मिट सकता है। नियमित backup रखें। GST हिसाब basic है; HSN/rate/place of supply/discount और कानूनी invoice rules CA/GST professional से verify करें।
