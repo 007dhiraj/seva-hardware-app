@@ -1,7 +1,7 @@
 {
   "appId": "com.sevahardware.businessmanager",
   "appName": "SEVA Hardware",
-  "webDir": ".",
+  "webDir": "www",
   "server": {
     "androidScheme": "https"
   }
