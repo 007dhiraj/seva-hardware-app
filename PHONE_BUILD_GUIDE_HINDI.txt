@@ -1,0 +1,16 @@
+SEVA HARDWARE APK — PHONE SE CLOUD BUILD
+
+Is ZIP mein GitHub Actions workflow add kiya gaya hai. APK cloud mein build hoga; phone par Android Studio ki zaroorat nahi.
+
+Zaroori baat: Is ChatGPT environment mein internet/Android SDK access nahi hai, isliye main yahin APK compile karke attach nahi kar sakta. Neeche diye steps aap apne Android phone ke Chrome se kar sakte hain.
+
+1. GitHub.com par account banayein ya login karein.
+2. New repository banayein. Naam: seva-hardware-app. Public ya Private aapki choice.
+3. ZIP ko phone mein extract karein.
+4. Extracted folder ke andar seva_hardware_android_app folder ke sabhi files/folders (including .github) repository ke root mein upload karein. GitHub website par Add file > Upload files use karein. Hidden .github folder upload na ho to GitHub web editor se workflow file banani hogi: .github/workflows/android-apk.yml; is ZIP ke same naam wali file ka content copy karein.
+5. Upload ke baad Commit changes karein.
+6. Repository mein Actions tab kholein. “Build SEVA Hardware APK” workflow select karein. Agar automatic run na hua ho to Run workflow dabayein.
+7. Build complete hone par run ke neeche Artifacts section mein “SEVA-Hardware-APK” download karein.
+8. ZIP artifact ko phone mein extract karein. app-debug.apk par tap karke install karein. Android agar permission maange to Chrome/Files ke liye “Install unknown apps” allow karein.
+
+Security: APK debug-signed hogi, Play Store release ke liye nahi. Is project ka local data phone par hi rahega; app uninstall/data clear karne se data ja sakta hai. Regular backup rakhein.
