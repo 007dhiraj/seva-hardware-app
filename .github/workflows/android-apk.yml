@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 60
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -31,16 +31,17 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      # Do not request the obsolete SDK package named "tools".
       - name: Set up Android command-line tools
         uses: android-actions/setup-android@v3
         with:
-          packages: platform-tools
+          packages: |
+            platform-tools
+            emulator
 
       - name: Install Android SDK platform and build tools
         run: |
           yes | sdkmanager --licenses
-          sdkmanager --install "platforms;android-35" "build-tools;35.0.0"
+          sdkmanager --install "platforms;android-35" "build-tools;35.0.0" "system-images;android-35;google_apis;x86_64"
 
       - name: Reassemble app source and tests
         run: |
@@ -63,7 +64,7 @@ jobs:
           for (const asset of ['style.css', 'manifest.json', 'business-core.js', 'app.js']) {
             if (!html.includes(asset) || !fs.existsSync(`www/${asset}`)) throw new Error(`Missing app asset: ${asset}`);
           }
-          for (const id of ['activeAccountLabel', 'logoutBtn', 'salePaidLabel', 'saleTaxable']) {
+          for (const id of ['activeAccountLabel', 'logoutBtn', 'salePaidLabel', 'saleTaxable', 'saveSaleNew']) {
             if (!html.includes(`id="${id}"`)) throw new Error(`Missing required UI element: ${id}`);
           }
           NODE
@@ -80,24 +81,18 @@ jobs:
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace assembleDebug
 
-      - name: Verify APK package and checksum
+      - name: Verify APK package, signature and checksum
         run: |
+          set -euo pipefail
           APK=android/app/build/outputs/apk/debug/app-debug.apk
           test -s "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.sevahardware.businessmanager'"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
           sha256sum "$APK"
           stat -c 'APK size: %s bytes' "$APK"
 
-      - name: Upload directly installable debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: SEVA-Hardware-Android-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-          retention-days: 30
-
       - name: Install and launch APK on Android emulator
-        continue-on-error: true
+        timeout-minutes: 20
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
@@ -105,10 +100,29 @@ jobs:
           arch: x86_64
           profile: pixel_2
           disable-animations: true
+          emulator-boot-timeout: 600
           script: |
-            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-            adb shell monkey -p com.sevahardware.businessmanager 1
-            sleep 10
-            adb shell pidof com.sevahardware.businessmanager
-            if adb logcat -d -t 2500 | grep -E 'FATAL EXCEPTION|Process: com.sevahardware.businessmanager'; then exit 1; fi
+            set -euo pipefail
+            APK=android/app/build/outputs/apk/debug/app-debug.apk
+            PKG=com.sevahardware.businessmanager
+            adb install -r "$APK"
+            adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1
+            for attempt in $(seq 1 30); do
+              PID="$(adb shell pidof "$PKG" | tr -d '\r')"
+              if [ -n "$PID" ]; then break; fi
+              sleep 1
+            done
+            test -n "$PID"
+            adb shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' | grep -F "$PKG"
+            if adb logcat -d -t 4000 | grep -E "FATAL EXCEPTION|Process: $PKG"; then
+              echo "App crashed during emulator launch"
+              exit 1
+            fi
 
+      - name: Upload verified directly installable debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SEVA-Hardware-Android-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
