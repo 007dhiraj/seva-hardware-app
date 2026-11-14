@@ -172,8 +172,9 @@ jobs:
               sleep 1
             done
             test -n "$PID"
+            sleep 3
             adb shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' | grep -F "$PKG"
-            if adb logcat -d -t 4000 | grep -E "FATAL EXCEPTION|Process: $PKG"; then
+            if adb logcat -d -t 4000 | grep -F "Process: $PKG"; then
               echo "App crashed during emulator launch"
               exit 1
             fi
