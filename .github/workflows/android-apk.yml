@@ -108,7 +108,7 @@ jobs:
             adb install -r "$APK"
             adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1
             for attempt in $(seq 1 30); do
-              PID="$(adb shell pidof "$PKG" | tr -d '\r')"
+              PID="$(adb shell pidof "$PKG" 2>/dev/null | tr -d '\r' || true)"
               if [ -n "$PID" ]; then break; fi
               sleep 1
             done
