@@ -54,6 +54,65 @@ jobs:
       - name: Run business logic and asset tests
         run: npm test
 
+      - name: Verify billing calculations, ledgers, stock and backup invariants
+        run: |
+          node - <<'NODE'
+          const assert = require('node:assert/strict');
+          const Core = require('./www/business-core.js');
+
+          assert.equal(Core.financialYearCode('2026-03-31'), '25-26');
+          assert.equal(Core.financialYearCode('2026-04-01'), '26-27');
+
+          const invoice = Core.calculateInvoice(
+            [{ name: 'Test item', qty: 2, price: 100, gst: 18 }],
+            { taxEnabled: true, discountType: 'amount', discountValue: 20 }
+          );
+          assert.equal(invoice.subtotal, 200);
+          assert.equal(invoice.discount, 20);
+          assert.equal(invoice.taxable, 180);
+          assert.equal(invoice.tax, 32.4);
+          assert.equal(invoice.total, 212.4);
+
+          const nonGst = Core.calculateInvoice(
+            [{ qty: 1, price: 100, gst: 18 }],
+            { taxEnabled: false }
+          );
+          assert.equal(nonGst.tax, 0);
+          assert.equal(nonGst.total, 100);
+
+          const balance = Core.partyBalance({ name: 'Customer' }, {
+            sales: [{ party: 'Customer', total: 236, paid: 50, kind: 'cash' }],
+            purchases: [{ party: 'Customer', total: 118, paid: 18 }],
+            payments: [
+              { party: 'Customer', kind: 'receipt', amount: 25 },
+              { party: 'Customer', kind: 'payment', amount: 10 }
+            ]
+          });
+          assert.equal(balance, 71);
+
+          const stock = Core.stockOnHand({ id: 'p1', opening: 2 }, {
+            purchases: [{ lines: [{ productId: 'p1', qty: 5 }] }],
+            sales: [
+              { kind: 'cash', lines: [{ productId: 'p1', qty: 3 }] },
+              { kind: 'return', lines: [{ productId: 'p1', qty: 1 }] }
+            ]
+          });
+          assert.equal(stock, 5);
+
+          const products = [];
+          const lines = [{ name: 'Purchased item', qty: 2, price: 80, gst: 18 }];
+          Core.attachPurchasedProducts(products, lines, () => 'created-product');
+          assert.equal(products.length, 1);
+          assert.equal(lines[0].productId, 'created-product');
+
+          const backup = Core.backupPayload(
+            { phone: '9999999999', business: 'Test Shop', pin: '1234' },
+            { sales: [] }
+          );
+          assert.equal(Object.hasOwn(backup.account, 'pin'), false);
+          console.log('Billing core invariants passed.');
+          NODE
+
       - name: Validate app assets and JavaScript
         run: |
           node --check www/business-core.js
