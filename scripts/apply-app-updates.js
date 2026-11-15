@@ -2,9 +2,9 @@ const fs=require('node:fs'),path=require('node:path');
 const hp=path.join('www','index.html'),ap=path.join('www','app.js');
 let html=fs.readFileSync(hp,'utf8'),app=fs.readFileSync(ap,'utf8');
 for(const [a,b] of [
-['<title>Seva Hardware Business Manager</title>','<title>Business Manager</title>'],
-['<h1>Seva Hardware</h1>','<h1>Business Manager</h1>'],
-['<h2>Seva Hardware</h2>','<h2>Business Manager</h2>'],
+['<title>Seva Hardware Business Manager</title>','<title>Free Bill</title>'],
+['<h1>Seva Hardware</h1>','<h1>Free Bill</h1>'],
+['<h2>Seva Hardware</h2>','<h2>Free Bill</h2>'],
 ['<p>Offline Business Manager</p>','<p>Billing & Business Manager</p>'],
 ['<b id="topBusiness">Seva Hardware</b>','<b id="topBusiness">My Business</b>'],
 ['<label>Business name (new account)<input id="authBusiness" placeholder="Seva Hardware"></label>','<label>Business name (new account)<input id="authBusiness" placeholder="Enter your shop name"></label>'],
