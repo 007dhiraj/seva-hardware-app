@@ -36,6 +36,11 @@ jobs:
         with:
           packages: platform-tools
 
+      - name: Install Android emulator host dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpulse0t64
+
       - name: Install Android SDK platform, emulator and build tools
         run: |
           yes | sdkmanager --licenses
