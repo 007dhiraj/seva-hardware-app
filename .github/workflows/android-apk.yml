@@ -1,4 +1,4 @@
-name: Build SEVA Hardware installable APK
+name: Build Free Bill installable APK
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: seva-hardware-apk-${{ github.ref }}
+  group: free-bill-apk-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -39,7 +39,11 @@ jobs:
       - name: Install Android emulator host dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libpulse0t64
+          if apt-cache show libpulse0t64 >/dev/null 2>&1; then
+            sudo apt-get install -y libpulse0t64
+          else
+            sudo apt-get install -y libpulse0
+          fi
 
       - name: Install Android SDK platform, emulator and build tools
         run: |
@@ -187,7 +191,7 @@ jobs:
       - name: Upload verified directly installable debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: SEVA-Hardware-Android-APK
+          name: Free-Bill-Android-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
