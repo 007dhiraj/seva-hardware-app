@@ -1,4 +1,4 @@
-# SEVA Hardware — Android billing app
+# Free Bill — Android billing app
 
 This repository builds a **debug-signed APK for direct Android installation**. It does not build an AAB or publish anything to Google Play.
 
@@ -18,12 +18,12 @@ The app's web source and Node tests are stored as a compressed source bundle in 
 ## Build and download the APK
 
 1. Open the repository on GitHub and choose **Actions**.
-2. Open **Build SEVA Hardware installable APK**.
+2. Open **Build Free Bill installable APK**.
 3. Select **Run workflow** (or wait for the build after a commit).
 4. Wait until the run is green. The workflow runs Node business-logic tests, builds the APK, checks its Android package ID, installs and launches it on an Android emulator, then uploads the APK artifact.
-5. Open the successful run, scroll to **Artifacts**, and download **SEVA-Hardware-Android-APK**.
+5. Open the successful run, scroll to **Artifacts**, and download **Free-Bill-Android-APK**.
 6. Extract the downloaded ZIP on your Android phone, tap `app-debug.apk`, and allow **Install unknown apps** for the app (Chrome or Files) if Android asks.
-7. Open **SEVA Hardware**, create a local account with your mobile number and a 4–6 digit PIN, and keep that PIN private.
+7. Open **Free Bill**, create a local account with your mobile number and a 4–6 digit PIN, and keep that PIN private.
 
 The APK is debug-signed for direct testing/installation. It is not a Play Store release. If a previous version is already installed with a different signing key, Android may require uninstalling that old version first; uninstalling removes its local app data, so export a backup first.
 
