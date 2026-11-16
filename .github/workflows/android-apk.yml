@@ -49,8 +49,8 @@ jobs:
         run: |
           yes | sdkmanager --licenses
           sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
-          test -x "$ANDROID_HOME/emulator/emulator"
-          "$ANDROID_HOME/emulator/emulator" -version
+          test -x "$ANDROID_HOME/build-tools/35.0.0/aapt"
+          test -x "$ANDROID_HOME/build-tools/35.0.0/apksigner"
 
       - name: Reassemble app source and tests
         run: |
