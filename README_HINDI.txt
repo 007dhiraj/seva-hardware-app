@@ -1,4 +1,4 @@
-SEVA HARDWARE — ANDROID BILLING APP
+FREE BILL — ANDROID BILLING APP
 
 इस repository से सीधे Android फोन में install होने वाली debug APK बनती है। Play Store या AAB नहीं बनता।
 
@@ -14,10 +14,10 @@ SEVA HARDWARE — ANDROID BILLING APP
 
 APK डाउनलोड/इंस्टॉल:
 1. GitHub repository खोलें: 007dhiraj/seva-hardware-app
-2. Actions → “Build SEVA Hardware installable APK” खोलें।
+2. Actions → “Build Free Bill installable APK” खोलें।
 3. Run workflow दबाएँ या main पर commit के बाद आने वाला run खोलें।
 4. Run green/success होने और emulator install/launch check पूरा होने दें।
-5. Artifacts में SEVA-Hardware-Android-APK ZIP डाउनलोड करें।
+5. Artifacts में Free-Bill-Android-APK ZIP डाउनलोड करें।
 6. ZIP extract करके app-debug.apk पर tap करें। Android पूछे तो Chrome/Files के लिए Install unknown apps अनुमति दें।
 7. App में अपना mobile number और PIN बनाएं।
 
