@@ -1,19 +1,26 @@
-# Seva Hardware Android App
+# Free Bill Android App
 
-यह repository direct-install Android debug APK बनाती है। Play Store पर publish नहीं किया जाता।
+यह repository सीधे Android फोन में install होने वाली debug APK बनाती है। Play Store पर publish नहीं किया जाता और AAB नहीं बनता।
 
-## APK कैसे लें
-1. GitHub में **Actions** खोलें।
-2. **Build SEVA Hardware installable APK** चुनें।
-3. **Run workflow** दबाएँ।
-4. Successful run में **Artifacts → SEVA-Hardware-Android-APK** ZIP डाउनलोड करें।
-5. ZIP extract करें और `app-debug.apk` install करें। Android के Install unknown apps prompt में Files/Chrome को अनुमति दें।
+## APK कैसे डाउनलोड करें
+1. GitHub repository खोलें: https://github.com/007dhiraj/seva-hardware-app
+2. **Actions** tab खोलें।
+3. **Build Free Bill installable APK** workflow चुनें।
+4. Run को **success** होने दें। Emulator install/launch जाँच भी पूरी होनी चाहिए।
+5. Successful run खोलें और **Artifacts → Free-Bill-Android-APK** ZIP डाउनलोड करें।
+6. ZIP extract करके `app-debug.apk` पर tap करें। Android पूछे तो Files/Chrome के लिए **Install unknown apps** अनुमति दें।
+7. Free Bill खोलकर अपना mobile number और local PIN बनाएं।
 
-## App में क्या है
-Sales cash/credit/return invoices, GST percentage configuration and basic calculations, purchase entries, stock/product list, customers/suppliers and ledgers, receipts/payments, expenses, reports, CSV export, JSON backup/restore.
+## इस offline build की सुविधाएँ
+Sales cash/credit/return invoices, purchase entries, product/inventory, customer/supplier records, party ledgers, receipts/payments, expenses, basic reports, CSV export, JSON backup/restore और Android back navigation।
 
-## Backup
-Settings & Backup में Download full backup चुनें और JSON file को सुरक्षित Files/Drive location में save करें। Restore मौजूदा local account data replace करता है।
+## Backup और restore
+More → Settings & Backup → Download full backup चुनें। Android share sheet से JSON backup को Files/Drive में सुरक्षित रखें। Restore backup में JSON file चुनें; restore मौजूदा account data replace करता है। Phone बदलने, app update करने या uninstall करने से पहले backup लें।
 
-## Data and GST caveats
-Data इसी device पर रहता है। Cloud database, multi-branch logins और automatic sync अभी नहीं हैं। OTP नहीं है और business records encrypted नहीं हैं। App uninstall/data clear करने पर data जा सकता है। GST calculations indicative हैं; HSN, GST rate, place of supply, discount eligibility और invoice rules CA/GST professional से verify करें। यह statutory GST filing/accounting software नहीं है।
+## Data, privacy और GST की सीमाएँ
+- Data इसी फोन के app storage में रहता है। Cloud database, multi-branch login और automatic cross-device sync अभी लागू नहीं हैं।
+- OTP verification नहीं है। PIN local convenience lock है; business records इस build में encrypted नहीं हैं।
+- App uninstall या app data clear करने पर records मिट सकते हैं। नियमित backup रखें।
+- GST calculations basic estimates हैं। GSTIN, HSN, place of supply, exemptions, reverse charge, cess, e-invoice/e-way bill और statutory returns validate नहीं होते। सही GST treatment और invoice compliance CA/GST professional से verify करें।
+- Reports operational summaries हैं, audited accounts नहीं। WhatsApp action केवल message/chat खोलता है; send user को खुद करना है।
+- APK debug-signed है और direct testing/installation के लिए है; Play Store release नहीं।
