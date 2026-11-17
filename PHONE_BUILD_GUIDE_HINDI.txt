@@ -1,16 +1,18 @@
-SEVA HARDWARE — ANDROID APK
+FREE BILL — ANDROID APK
 
-यह project GitHub Actions से सीधे install होने वाली debug APK बनाता है। Play Store/AAB नहीं बनता।
+यह project GitHub Actions से सीधे install होने वाली Android debug APK बनाता है। Play Store/AAB नहीं बनता।
 
 APK लेने के steps:
-1. GitHub repository खोलें: 007dhiraj/seva-hardware-app
+1. Repository खोलें: https://github.com/007dhiraj/seva-hardware-app
 2. Actions tab खोलें।
-3. “Build SEVA Hardware installable APK” workflow चुनें।
-4. Run workflow दबाएँ और green/success run पूरा होने दें।
-5. सफल run खोलें और नीचे Artifacts में SEVA-Hardware-Android-APK डाउनलोड करें।
-6. ZIP extract करें, app-debug.apk पर tap करें। Android पूछे तो Chrome/Files के लिए Install unknown apps की अनुमति दें।
-7. App खोलकर अपना mobile number और 4–6 digit local PIN बनाएं।
+3. “Build Free Bill installable APK” workflow चुनें।
+4. Run को green/success होने दें। Android emulator में install और launch check पूरा होना जरूरी है।
+5. Successful run खोलें और Artifacts में “Free-Bill-Android-APK” ZIP डाउनलोड करें।
+6. ZIP extract करें और app-debug.apk पर tap करें। Android पूछे तो Files/Chrome के लिए Install unknown apps अनुमति दें।
+7. Free Bill खोलकर अपना mobile number और local PIN बनाएं।
 
-Backup: App में More → Settings & Backup → Download full backup चुनें। Android share sheet में Files/Drive पर JSON backup सुरक्षित रखें। Restore backup में वही JSON file चुनें। Restore मौजूदा account data replace करता है।
+Backup:
+More → Settings & Backup → Download full backup चुनें। Android share sheet से JSON file को Files/Drive में सुरक्षित रखें। Restore backup में वही JSON file चुनें; restore मौजूदा account data replace करता है।
 
-जरूरी सीमा: अभी data इसी फोन में रहता है। Cloud database, multi-branch login और automatic sync नहीं हैं। OTP नहीं है और data encryption नहीं है। App uninstall या app data clear करने से data मिट सकता है। नियमित backup रखें। GST हिसाब basic है; HSN/rate/place of supply/discount और कानूनी invoice rules CA/GST professional से verify करें।
+सीमाएँ:
+Data इसी फोन में रहता है। Cloud database, multi-branch login, automatic sync और OTP अभी लागू नहीं हैं। Business data encrypted नहीं है। App uninstall या app data clear करने से data मिट सकता है। नियमित backup रखें। GST calculation basic है; HSN, GST rate, place of supply, discount और कानूनी invoice rules CA/GST professional से verify करें।
