@@ -171,6 +171,10 @@ jobs:
           disable-linux-hw-accel: true
           emulator-boot-timeout: 600
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -memory 2048 -cores 2
+          pre-emulator-launch-script: |
+            set -euo pipefail
+            adb start-server
+            adb devices
           script: |
             set -euo pipefail
             APK=android/app/build/outputs/apk/debug/app-debug.apk
