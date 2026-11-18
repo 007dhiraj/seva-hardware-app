@@ -182,8 +182,13 @@ jobs:
           PKG=com.sevahardware.businessmanager
           IMAGE="system-images;android-30;google_apis;x86_64"
           EMULATOR_LOG="$RUNNER_TEMP/freebill-emulator.log"
+          export ANDROID_AVD_HOME="$HOME/.android/avd"
 
+          mkdir -p "$ANDROID_AVD_HOME"
+          echo "Creating AVD in $ANDROID_AVD_HOME"
           echo "no" | avdmanager create avd --name "$AVD" --package "$IMAGE" --device "pixel_2" --force
+          avdmanager list avd
+          test -s "$ANDROID_AVD_HOME/$AVD.ini"
           adb start-server
           nohup "$ANDROID_HOME/emulator/emulator" -avd "$AVD" -port 5554 \
             -no-window -gpu swiftshader_indirect -no-snapshot -noaudio \
