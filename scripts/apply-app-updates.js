@@ -47,11 +47,11 @@ if(!app.includes(oldPinHandler))throw Error('PIN handler source changed; refusin
 app=app.replace(oldPinHandler,newPinHandler);
 core=core.replace("app: 'Seva Hardware Business Manager'","app: 'Free Bill'");
 manifest.name='Free Bill';manifest.short_name='Free Bill';manifest.description='Free Bill offline billing and business management';
-sw=sw.replace(/seva-hardware-v\\d+/g,'free-bill-v3');
+sw=sw.replace(/seva-hardware-v\d+/g,'free-bill-v3');
 if(html.includes('id="payable"')||html.includes('<div class="logo">SH</div>'))throw Error('Old dashboard or logo branding remains');
 if(!html.includes('id="currentAccountPin"'))throw Error('Current PIN verification field missing');
 if(app.includes("return 'SH/'")||app.includes('seva-hardware-')||app.includes("title:'SEVA Hardware backup'"))throw Error('Old transaction or backup branding remains');
 if(core.includes("Seva Hardware Business Manager"))throw Error('Old backup metadata remains');
 if(manifest.name!=='Free Bill'||manifest.short_name!=='Free Bill'||sw.includes('seva-hardware'))throw Error('Manifest or service-worker branding is not updated');
-fs.writeFileSync(cp,css);fs.writeFileSync(hp,html);fs.writeFileSync(ap,app);fs.writeFileSync(corePath,core);fs.writeFileSync(manifestPath,JSON.stringify(manifest,null,2)+'\\n');fs.writeFileSync(swPath,sw);
+fs.writeFileSync(cp,css);fs.writeFileSync(hp,html);fs.writeFileSync(ap,app);fs.writeFileSync(corePath,core);fs.writeFileSync(manifestPath,JSON.stringify(manifest,null,2)+'\n');fs.writeFileSync(swPath,sw);
 console.log('Applied Free Bill branding, receivable-only dashboard, ranked product suggestions, Save / Save & New, and current-PIN verification.');
