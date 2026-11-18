@@ -119,6 +119,7 @@ jobs:
             { sales: [] }
           );
           assert.equal(Object.hasOwn(backup.account, 'pin'), false);
+          assert.equal(backup.app, 'Free Bill');
           console.log('Billing core invariants passed.');
           NODE
 
@@ -132,9 +133,21 @@ jobs:
           for (const asset of ['style.css', 'manifest.json', 'business-core.js', 'app.js']) {
             if (!html.includes(asset) || !fs.existsSync(`www/${asset}`)) throw new Error(`Missing app asset: ${asset}`);
           }
-          for (const id of ['activeAccountLabel', 'logoutBtn', 'salePaidLabel', 'saleTaxable', 'saveSaleNew']) {
+          for (const id of ['activeAccountLabel', 'logoutBtn', 'salePaidLabel', 'saleTaxable', 'saveSaleNew', 'currentAccountPin']) {
             if (!html.includes(`id="${id}"`)) throw new Error(`Missing required UI element: ${id}`);
           }
+          const app = fs.readFileSync('www/app.js', 'utf8');
+          const core = fs.readFileSync('www/business-core.js', 'utf8');
+          const manifest = JSON.parse(fs.readFileSync('www/manifest.json', 'utf8'));
+          const sw = fs.readFileSync('www/sw.js', 'utf8');
+          if (html.includes('id="payable"')) throw new Error('Dashboard must not show amount to pay');
+          if (html.includes('<div class="logo">SH</div>')) throw new Error('Legacy logo initials remain');
+          if (!app.includes('oldPin!==currentUser.pin')) throw new Error('PIN change must verify the current PIN');
+          if (!app.includes("return 'FB/'")) throw new Error('Invoice transaction IDs must use Free Bill branding');
+          if (app.includes('seva-hardware-') || app.includes("title:'SEVA Hardware backup'")) throw new Error('Legacy backup branding remains');
+          if (core.includes('Seva Hardware Business Manager')) throw new Error('Legacy backup metadata remains');
+          if (manifest.name !== 'Free Bill' || manifest.short_name !== 'Free Bill') throw new Error('Manifest branding is incorrect');
+          if (sw.includes('seva-hardware')) throw new Error('Legacy service-worker cache name remains');
           NODE
 
       - name: Generate Android project
@@ -211,7 +224,7 @@ jobs:
           FOREGROUND="$(adb -s "$SERIAL" shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' || true)"
           echo "$FOREGROUND"
           echo "$FOREGROUND" | grep -F "$PKG"
-          CRASH="$(adb -s "$SERIAL" logcat -d -t 5000 | grep -E 'FATAL EXCEPTION|Process: com\\.sevahardware\\.businessmanager' || true)"
+          CRASH="$(adb -s "$SERIAL" logcat -d -t 5000 | grep -E 'FATAL EXCEPTION' || true)"
           if [ -n "$CRASH" ]; then
             echo "$CRASH"
             echo "Free Bill crashed during emulator launch"
