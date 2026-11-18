@@ -181,25 +181,45 @@ jobs:
           APK=android/app/build/outputs/apk/debug/app-debug.apk
           PKG=com.sevahardware.businessmanager
           IMAGE="system-images;android-30;google_apis;x86_64"
+          EMULATOR_LOG="$RUNNER_TEMP/freebill-emulator.log"
 
           echo "no" | avdmanager create avd --name "$AVD" --package "$IMAGE" --device "pixel_2" --force
           adb start-server
           nohup "$ANDROID_HOME/emulator/emulator" -avd "$AVD" -port 5554 \
             -no-window -gpu swiftshader_indirect -no-snapshot -noaudio \
-            -no-boot-anim -no-metrics -memory 2048 -cores 2 \
-            > "$RUNNER_TEMP/freebill-emulator.log" 2>&1 &
+            -no-boot-anim -no-metrics -memory 3072 -cores 2 -verbose \
+            > "$EMULATOR_LOG" 2>&1 &
+          EMULATOR_PID=$!
           trap 'adb -s "$SERIAL" emu kill >/dev/null 2>&1 || true' EXIT
 
-          adb wait-for-device
+          sleep 15
+          if ! kill -0 "$EMULATOR_PID" 2>/dev/null; then
+            echo "Android emulator process exited before ADB became available."
+            tail -n 200 "$EMULATOR_LOG" || true
+            exit 1
+          fi
+
+          WAIT_STATUS=0
+          timeout 360s adb -s "$SERIAL" wait-for-device || WAIT_STATUS=$?
+          if [ "$WAIT_STATUS" -ne 0 ]; then
+            echo "Timed out waiting for Android emulator ADB device (status $WAIT_STATUS)."
+            adb devices -l || true
+            ps -ef | grep -E '[e]mulator|[q]emu' || true
+            tail -n 250 "$EMULATOR_LOG" || true
+            exit 1
+          fi
+
           BOOT=""
-          for attempt in $(seq 1 600); do
-            BOOT="$(adb -s "$SERIAL" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
+          for attempt in $(seq 1 480); do
+            BOOT="$(timeout 15s adb -s "$SERIAL" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
             if [ "$BOOT" = "1" ]; then break; fi
             sleep 1
           done
           if [ "$BOOT" != "1" ]; then
-            echo "Android emulator did not finish booting"
-            tail -n 100 "$RUNNER_TEMP/freebill-emulator.log" || true
+            echo "Android emulator connected to ADB but did not finish booting."
+            adb devices -l || true
+            adb -s "$SERIAL" logcat -d -t 3000 | tail -n 160 || true
+            tail -n 200 "$EMULATOR_LOG" || true
             exit 1
           fi
 
@@ -209,7 +229,7 @@ jobs:
 
           PID=""
           for attempt in $(seq 1 45); do
-            PID="$(adb -s "$SERIAL" shell pidof "$PKG" 2>/dev/null | tr -d '\r' || true)"
+            PID="$(timeout 15s adb -s "$SERIAL" shell pidof "$PKG" 2>/dev/null | tr -d '\r' || true)"
             if [ -n "$PID" ]; then break; fi
             sleep 1
           done
