@@ -44,6 +44,14 @@ jobs:
           else
             sudo apt-get install -y libpulse0
           fi
+          if [ -e /dev/kvm ]; then
+            sudo chmod 666 /dev/kvm
+            test -r /dev/kvm && test -w /dev/kvm
+            ls -l /dev/kvm
+          else
+            echo "KVM device is not available on this GitHub runner."
+            exit 1
+          fi
 
       - name: Install Android SDK platform, emulator and build tools
         run: |
