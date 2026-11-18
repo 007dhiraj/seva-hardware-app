@@ -48,7 +48,7 @@ jobs:
       - name: Install Android SDK platform, emulator and build tools
         run: |
           yes | sdkmanager --licenses
-          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          sdkmanager --install "platform-tools" "platforms;android-35" "build-tools;35.0.0" "emulator" "system-images;android-30;google_apis;x86_64"
           test -x "$ANDROID_HOME/build-tools/35.0.0/aapt"
           test -x "$ANDROID_HOME/build-tools/35.0.0/apksigner"
 
@@ -159,46 +159,70 @@ jobs:
           sha256sum "$APK"
           stat -c 'APK size: %s bytes' "$APK"
 
-      - name: Upload installable debug APK for user testing
+      - name: Install and launch APK on Android emulator
+        timeout-minutes: 20
+        run: |
+          set -euo pipefail
+          AVD=freebill-ci
+          SERIAL=emulator-5554
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          PKG=com.sevahardware.businessmanager
+          IMAGE="system-images;android-30;google_apis;x86_64"
+
+          echo "no" | avdmanager create avd --name "$AVD" --package "$IMAGE" --device "pixel_2" --force
+          adb start-server
+          nohup "$ANDROID_HOME/emulator/emulator" -avd "$AVD" -port 5554 \
+            -no-window -gpu swiftshader_indirect -no-snapshot -noaudio \
+            -no-boot-anim -no-metrics -memory 2048 -cores 2 \
+            > "$RUNNER_TEMP/freebill-emulator.log" 2>&1 &
+          trap 'adb -s "$SERIAL" emu kill >/dev/null 2>&1 || true' EXIT
+
+          adb wait-for-device
+          BOOT=""
+          for attempt in $(seq 1 600); do
+            BOOT="$(adb -s "$SERIAL" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r' || true)"
+            if [ "$BOOT" = "1" ]; then break; fi
+            sleep 1
+          done
+          if [ "$BOOT" != "1" ]; then
+            echo "Android emulator did not finish booting"
+            tail -n 100 "$RUNNER_TEMP/freebill-emulator.log" || true
+            exit 1
+          fi
+
+          adb -s "$SERIAL" shell input keyevent 82 || true
+          adb -s "$SERIAL" install -r "$APK"
+          adb -s "$SERIAL" shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1
+
+          PID=""
+          for attempt in $(seq 1 45); do
+            PID="$(adb -s "$SERIAL" shell pidof "$PKG" 2>/dev/null | tr -d '\r' || true)"
+            if [ -n "$PID" ]; then break; fi
+            sleep 1
+          done
+          if [ -z "$PID" ]; then
+            adb -s "$SERIAL" logcat -d -t 5000 | tail -n 200
+            echo "Free Bill process did not remain running after launch"
+            exit 1
+          fi
+
+          sleep 5
+          adb -s "$SERIAL" shell pm path "$PKG" | grep -F "package:"
+          FOREGROUND="$(adb -s "$SERIAL" shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' || true)"
+          echo "$FOREGROUND"
+          echo "$FOREGROUND" | grep -F "$PKG"
+          CRASH="$(adb -s "$SERIAL" logcat -d -t 5000 | grep -E 'FATAL EXCEPTION|Process: com\\.sevahardware\\.businessmanager' || true)"
+          if [ -n "$CRASH" ]; then
+            echo "$CRASH"
+            echo "Free Bill crashed during emulator launch"
+            exit 1
+          fi
+          echo "Free Bill installed and remained in the foreground without a startup crash."
+
+      - name: Upload verified installable debug APK
         uses: actions/upload-artifact@v4
         with:
           name: Free-Bill-Android-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 30
-
-      - name: Install and launch APK on Android emulator
-        timeout-minutes: 20
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 30
-          target: google_apis
-          arch: x86_64
-          profile: pixel_2
-          disable-animations: true
-          disable-linux-hw-accel: true
-          emulator-boot-timeout: 600
-          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -memory 2048 -cores 2
-          pre-emulator-launch-script: |
-            set -euo pipefail
-            adb start-server
-            adb devices
-          script: |
-            set -euo pipefail
-            APK=android/app/build/outputs/apk/debug/app-debug.apk
-            PKG=com.sevahardware.businessmanager
-            adb install -r "$APK"
-            adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1
-            for attempt in $(seq 1 30); do
-              PID="$(adb shell pidof "$PKG" 2>/dev/null | tr -d '\r' || true)"
-              if [ -n "$PID" ]; then break; fi
-              sleep 1
-            done
-            test -n "$PID"
-            sleep 3
-            adb shell dumpsys activity activities | grep -E 'mResumedActivity|topResumedActivity' | grep -F "$PKG"
-            if adb logcat -d -t 4000 | grep -F "Process: $PKG"; then
-              echo "App crashed during emulator launch"
-              exit 1
-            fi
-
