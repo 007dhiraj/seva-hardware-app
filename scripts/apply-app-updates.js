@@ -29,5 +29,29 @@ app=app.replace("if(el.classList.contains('line-name')){l.name=el.value;let p=db
 app=app.replace("||'Seva Hardware';if(phone.length<10)","||'My Business';if(phone.length<10)");
 if(app.includes("name:'Seva Hardware'")||app.includes("||'Seva Hardware'"))throw Error('Fixed brand remains in app defaults');
 if(!app.includes('function productOptions')||!app.includes('saveSaleNew'))throw Error('App enhancements missing');
-const cp=path.join('www','style.css');let css=fs.readFileSync(cp,'utf8');if(!css.includes('.bill-actions'))css+='\n.bill-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.bill-actions .wide{margin:6px 0}\n';fs.writeFileSync(cp,css);fs.writeFileSync(hp,html);fs.writeFileSync(ap,app);
-console.log('Applied generic branding, ranked product suggestions, and Save / Save & New actions.');
+const cp=path.join('www','style.css');let css=fs.readFileSync(cp,'utf8');if(!css.includes('.bill-actions'))css+='\n.bill-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.bill-actions .wide{margin:6px 0}\n';
+
+// Apply the final Free Bill branding and the user's dashboard/security preferences.
+const corePath=path.join('www','business-core.js'),manifestPath=path.join('www','manifest.json'),swPath=path.join('www','sw.js');
+let core=fs.readFileSync(corePath,'utf8'),manifest=JSON.parse(fs.readFileSync(manifestPath,'utf8')),sw=fs.readFileSync(swPath,'utf8');
+html=html.replaceAll('<div class="logo">SH</div>','<div class="logo">FB</div>');
+html=html.replace('<div class="stat"><small>Payable</small><b id="payable">₹0</b></div>','');
+html=html.replace('<label>New 4–6 digit PIN<input id="changeAccountPin" type="password" inputmode="numeric" maxlength="6" placeholder="New PIN"></label>','<label>Current PIN<input id="currentAccountPin" type="password" inputmode="numeric" maxlength="6" placeholder="Enter current PIN"></label><label>New 4–6 digit PIN<input id="changeAccountPin" type="password" inputmode="numeric" maxlength="6" placeholder="New PIN"></label>');
+app=app.replace("$('#payable').textContent=fmt(Math.abs(bs.filter(x=>x<0).reduce((a,b)=>a+b,0)));",'');
+app=app.replace("return 'SH/'+fy+'/'+kind+'/'+String(n).padStart(4,'0')","return 'FB/'+fy+'/'+kind+'/'+String(n).padStart(4,'0')");
+app=app.replace("filename='seva-hardware-'+currentUser.phone+'-backup-'","filename='free-bill-'+currentUser.phone+'-backup-'");
+app=app.replace("title:'SEVA Hardware backup'","title:'Free Bill backup'");
+const oldPinHandler="$('#changePinBtn').onclick=()=>{let pin=$('#changeAccountPin').value;if(!/\\d{4,6}$/.test(pin)){toast('PIN 4 to 6 digits ka hona chahiye');return}let a=getAccounts(),i=a.findIndex(x=>x.phone===currentUser.phone);if(i<0)return;a[i].pin=pin;saveAccounts(a);currentUser=a[i];$('#changeAccountPin').value='';toast('Account PIN changed')};";
+const newPinHandler="$('#changePinBtn').onclick=()=>{let oldPin=$('#currentAccountPin').value,pin=$('#changeAccountPin').value;if(oldPin!==currentUser.pin){toast('Current PIN is incorrect');return}if(!/^\\d{4,6}$/.test(pin)){toast('PIN 4 to 6 digits ka hona chahiye');return}let a=getAccounts(),i=a.findIndex(x=>x.phone===currentUser.phone);if(i<0)return;a[i].pin=pin;if(!saveAccounts(a))return;currentUser=a[i];$('#currentAccountPin').value='';$('#changeAccountPin').value='';toast('Account PIN changed')};";
+if(!app.includes(oldPinHandler))throw Error('PIN handler source changed; refusing unsafe partial patch');
+app=app.replace(oldPinHandler,newPinHandler);
+core=core.replace("app: 'Seva Hardware Business Manager'","app: 'Free Bill'");
+manifest.name='Free Bill';manifest.short_name='Free Bill';manifest.description='Free Bill offline billing and business management';
+sw=sw.replace(/seva-hardware-v\\d+/g,'free-bill-v3');
+if(html.includes('id="payable"')||html.includes('<div class="logo">SH</div>'))throw Error('Old dashboard or logo branding remains');
+if(!html.includes('id="currentAccountPin"'))throw Error('Current PIN verification field missing');
+if(app.includes("return 'SH/'")||app.includes('seva-hardware-')||app.includes("title:'SEVA Hardware backup'"))throw Error('Old transaction or backup branding remains');
+if(core.includes("Seva Hardware Business Manager"))throw Error('Old backup metadata remains');
+if(manifest.name!=='Free Bill'||manifest.short_name!=='Free Bill'||sw.includes('seva-hardware'))throw Error('Manifest or service-worker branding is not updated');
+fs.writeFileSync(cp,css);fs.writeFileSync(hp,html);fs.writeFileSync(ap,app);fs.writeFileSync(corePath,core);fs.writeFileSync(manifestPath,JSON.stringify(manifest,null,2)+'\\n');fs.writeFileSync(swPath,sw);
+console.log('Applied Free Bill branding, receivable-only dashboard, ranked product suggestions, Save / Save & New, and current-PIN verification.');
