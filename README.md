@@ -4,7 +4,7 @@ This repository builds a **debug-signed APK for direct Android installation**. I
 
 ## Features in this offline build
 
-- Local mobile-number + PIN account on one device (no OTP).
+- Local mobile-number + PIN account on one device (no OTP); the login screen is shown on each cold app start instead of auto-signing in.
 - Sales invoices: cash, credit and sale-return entries; invoice IDs by financial year; print/share bill details and WhatsApp message hand-off.
 - Purchase entries, supplier records and stock updates (new purchased products are added to the product list).
 - Product master with unit, HSN, opening stock, low-stock level, sale/purchase rates and editable GST percentage.
@@ -37,7 +37,7 @@ The APK is debug-signed for direct testing/installation. It is not a Play Store 
 ## Important limitations and privacy
 
 - **No cloud database, no multi-branch login, and no automatic cross-device sync** are implemented in this build. Each local account and all business records live in this app's storage on this phone.
-- There is no OTP verification. The PIN is a local convenience lock/account check, not strong authentication. Business records are not encrypted by this version. Anyone with access to the unlocked phone/app storage may be able to access them.
+- There is no OTP verification. The PIN is stored locally in plain text and is only a convenience check, not strong authentication. Business records are not encrypted by this version. Anyone with access to the phone's app storage may be able to access them.
 - Uninstalling the app or clearing app data can permanently delete local records. Keep independent backups.
 - GST totals are basic estimates from the per-item GST percentage and selected intra/inter-state mode. The app does not validate GSTIN, HSN, place of supply, eligibility, discount conditions, exemptions, reverse charge, cess, e-invoice, e-way bill, returns or filing. The discount is treated as reducing the taxable value; confirm whether that treatment is legally applicable to each transaction. Have a qualified GST professional verify rates and invoice wording before issuing tax invoices or filing returns. This is not a statutory accounting/GST filing system.
 - Reports are operational summaries, not audited accounts or a statutory Profit & Loss statement.
