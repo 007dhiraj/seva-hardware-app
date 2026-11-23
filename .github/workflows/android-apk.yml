@@ -154,6 +154,10 @@ jobs:
           if (!app.includes("function boot(){localStorage.removeItem(SESSION_KEY);showAuth();$('#authPhone').focus()}")) throw new Error('App must require mobile/PIN login on every cold start');
           if (!app.includes("return 'FB/'")) throw new Error('Invoice transaction IDs must use Free Bill branding');
           if (app.includes('seva-hardware-') || app.includes("title:'SEVA Hardware backup'")) throw new Error('Legacy backup branding remains');
+          if (!core.includes('async function createPinCredential') || !core.includes('PBKDF2') || !core.includes('120000')) throw new Error('PIN hashing helper is missing or weakly configured');
+          if (!app.includes('async function authenticateAccount(phone,pin)') || !app.includes('Core.verifyPin(pin,acc)') || !app.includes('delete upgraded.pin')) throw new Error('PIN verification or legacy migration is missing');
+          if (app.includes('const acc={phone,pin,') || app.includes('a[i].pin=pin')) throw new Error('New PINs must not be stored as plaintext');
+          if (!fs.existsSync('tests/pin-security.test.js')) throw new Error('PIN security tests are missing');
           if (core.includes('Seva Hardware Business Manager')) throw new Error('Legacy backup metadata remains');
           if (manifest.name !== 'Free Bill' || manifest.short_name !== 'Free Bill') throw new Error('Manifest branding is incorrect');
           if (sw.includes('seva-hardware')) throw new Error('Legacy service-worker cache name remains');

@@ -3,7 +3,7 @@ FREE BILL — ANDROID BILLING APP
 इस repository से सीधे Android फोन में install होने वाली debug APK बनती है। Play Store या AAB नहीं बनता।
 
 मौजूदा सुविधाएँ:
-- Mobile number + 4–6 digit PIN से इसी फोन पर local account
+- Mobile number + 4–6 digit PIN से इसी फोन पर local account; PIN salted PBKDF2-SHA256 hash में (120,000 iterations)
 - Cash bill, credit bill और sale return
 - Purchase entry और purchase के समय नया product अपने-आप stock list में जुड़ना
 - Product, unit, HSN, opening stock, low-stock level, purchase/sale rate और editable GST प्रतिशत
