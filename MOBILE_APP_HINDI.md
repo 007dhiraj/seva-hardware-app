@@ -19,7 +19,7 @@ More → Settings & Backup → Download full backup चुनें। Android s
 
 ## Data, privacy और GST की सीमाएँ
 - Data इसी फोन के app storage में रहता है। Cloud database, multi-branch login और automatic cross-device sync अभी लागू नहीं हैं।
-- OTP verification नहीं है। PIN local convenience lock है; business records इस build में encrypted नहीं हैं।
+- OTP और Forgot-PIN recovery नहीं है। PIN salted PBKDF2-SHA256 hash (120,000 iterations) में रहता है; पुराने accounts सफल login पर upgrade होते हैं। Business records encrypted नहीं हैं।
 - App uninstall या app data clear करने पर records मिट सकते हैं। नियमित backup रखें।
 - GST calculations basic estimates हैं। GSTIN, HSN, place of supply, exemptions, reverse charge, cess, e-invoice/e-way bill और statutory returns validate नहीं होते। सही GST treatment और invoice compliance CA/GST professional से verify करें।
 - Reports operational summaries हैं, audited accounts नहीं। WhatsApp action केवल message/chat खोलता है; send user को खुद करना है।

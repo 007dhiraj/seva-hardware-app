@@ -15,4 +15,4 @@ Backup:
 More → Settings & Backup → Download full backup चुनें। Android share sheet से JSON file को Files/Drive में सुरक्षित रखें। Restore backup में वही JSON file चुनें; restore मौजूदा account data replace करता है।
 
 सीमाएँ:
-Data इसी फोन में रहता है। Cloud database, multi-branch login, automatic sync और OTP अभी लागू नहीं हैं। Business data encrypted नहीं है। App uninstall या app data clear करने से data मिट सकता है। नियमित backup रखें। GST calculation basic है; HSN, GST rate, place of supply, discount और कानूनी invoice rules CA/GST professional से verify करें।
+Data इसी फोन में रहता है। Cloud database, multi-branch login, automatic sync, OTP और Forgot-PIN recovery अभी लागू नहीं हैं। PIN salted PBKDF2-SHA256 hash (120,000 iterations) में रहता है; पुराने accounts सफल login पर upgrade होते हैं। Business data encrypted नहीं है। App uninstall या app data clear करने से data मिट सकता है। नियमित backup रखें। GST calculation basic है; HSN, GST rate, place of supply, discount और कानूनी invoice rules CA/GST professional से verify करें।
