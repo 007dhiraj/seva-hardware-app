@@ -5,12 +5,13 @@ This repository builds a **debug-signed APK for direct Android installation**. I
 ## Features in this offline build
 
 - Local mobile-number + PIN account on one device (no OTP); PINs use salted PBKDF2-SHA256 hashes (120,000 iterations), and the login screen is shown on each cold app start instead of auto-signing in.
-- Sales invoices: cash, credit and sale-return entries; invoice IDs by financial year; print/share bill details and WhatsApp message hand-off.
-- Purchase entries, supplier records and stock updates (new purchased products are added to the product list).
+- Sales invoices: cash, credit and sale-return entries; amount/percentage discounts; optional hamali, delivery, packaging/box or other charges with a separately entered GST rate; invoice IDs by financial year; print/share bill details and WhatsApp message hand-off.
+- Purchase entries with amount/percentage discounts, optional additional charges and a separately entered GST rate; supplier records and stock updates (new purchased products are added to the product list).
 - Product master with unit, HSN, opening stock, low-stock level, sale/purchase rates and editable GST percentage.
 - Customer/supplier records, party ledgers, receipts and payments.
 - Expenses, dashboard and basic period reports; CSV export.
-- JSON backup and restore. Backup metadata intentionally excludes the local account PIN.
+- JSON backup and restore. Restore validates the backup type/account, asks for confirmation before replacing data, and leaves current records unchanged if cancelled or if storage rejects the write. Backup metadata intentionally excludes the local account PIN.
+- CSV export includes subtotal, discount, taxable value, additional charges, charge GST, total GST, total and paid amount.
 - Android back navigation through the in-app page history.
 
 The app's web source and Node tests are stored as a compressed source bundle in the hidden `.source-bundle` parts. The build workflow reassembles the bundle automatically before testing and packaging.
@@ -39,7 +40,7 @@ The APK is debug-signed for direct testing/installation. It is not a Play Store 
 - **No cloud database, no multi-branch login, and no automatic cross-device sync** are implemented in this build. Each local account and all business records live in this app's storage on this phone.
 - There is no OTP verification or Forgot-PIN recovery. PINs use salted PBKDF2-SHA256 hashes; older local accounts upgrade after successful login. Business records are still not encrypted by this version. Anyone with access to the phone's app storage may be able to access them.
 - Uninstalling the app or clearing app data can permanently delete local records. Keep independent backups.
-- GST totals are basic estimates from the per-item GST percentage and selected intra/inter-state mode. The app does not validate GSTIN, HSN, place of supply, eligibility, discount conditions, exemptions, reverse charge, cess, e-invoice, e-way bill, returns or filing. The discount is treated as reducing the taxable value; confirm whether that treatment is legally applicable to each transaction. Have a qualified GST professional verify rates and invoice wording before issuing tax invoices or filing returns. This is not a statutory accounting/GST filing system.
+- GST totals are basic estimates from the per-item GST percentage and selected intra/inter-state mode. The app does not validate GSTIN, HSN, place of supply, eligibility, discount conditions, exemptions, reverse charge, cess, e-invoice, e-way bill, returns or filing. The discount is treated as reducing the item taxable value. Additional charges are shown separately and use a user-entered GST rate; some incidental charges may legally form part of the taxable value or require the same rate as the underlying supply. Confirm the correct treatment, rate and invoice wording with a qualified GST professional before issuing tax invoices or filing returns. Have a qualified GST professional verify rates and invoice wording before issuing tax invoices or filing returns. This is not a statutory accounting/GST filing system.
 - Reports are operational summaries, not audited accounts or a statutory Profit & Loss statement.
 - WhatsApp actions open a prepared message/chat; the user must review and send it. The app does not send messages automatically.
 
