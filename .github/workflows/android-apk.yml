@@ -64,6 +64,9 @@ jobs:
         run: |
           cat .source-bundle/part-*.b64 | base64 --decode | tar -xz
           node scripts/apply-app-updates.js
+          base64 --decode scripts/apply-data-safety.js.gz.b64 | gzip --decompress > scripts/apply-data-safety.js
+          node --check scripts/apply-data-safety.js
+          node scripts/apply-data-safety.js
 
       - name: Install Node dependencies
         run: npm install --no-audit --no-fund
@@ -135,13 +138,14 @@ jobs:
         run: |
           node --check www/business-core.js
           node --check www/app.js
+          node --check scripts/apply-data-safety.js
           node - <<'NODE'
           const fs = require('node:fs');
           const html = fs.readFileSync('www/index.html', 'utf8');
           for (const asset of ['style.css', 'manifest.json', 'business-core.js', 'app.js']) {
             if (!html.includes(asset) || !fs.existsSync(`www/${asset}`)) throw new Error(`Missing app asset: ${asset}`);
           }
-          for (const id of ['activeAccountLabel', 'logoutBtn', 'salePaidLabel', 'saleTaxable', 'saveSaleNew', 'currentAccountPin']) {
+          for (const id of ['activeAccountLabel', 'logoutBtn', 'salePaidLabel', 'saleTaxable', 'saveSaleNew', 'currentAccountPin', 'saleCharges', 'saleChargesGst', 'saleChargesNote', 'purchaseDiscType', 'purchaseDisc', 'purchaseCharges', 'purchaseChargesGst', 'purchaseChargesNote', 'purchaseDue']) {
             if (!html.includes(`id="${id}"`)) throw new Error(`Missing required UI element: ${id}`);
           }
           const app = fs.readFileSync('www/app.js', 'utf8');
@@ -158,6 +162,11 @@ jobs:
           if (!app.includes('async function authenticateAccount(phone,pin)') || !app.includes('Core.verifyPin(pin,acc)') || !app.includes('delete upgraded.pin')) throw new Error('PIN verification or legacy migration is missing');
           if (app.includes('const acc={phone,pin,') || app.includes('a[i].pin=pin')) throw new Error('New PINs must not be stored as plaintext');
           if (!fs.existsSync('tests/pin-security.test.js')) throw new Error('PIN security tests are missing');
+          if (!fs.existsSync('tests/additional-charges.test.js')) throw new Error('Additional charge and backup safety tests are missing');
+          if (!core.includes('function withAdditionalCharges(') || !app.includes('Core.withAdditionalCharges')) throw new Error('Additional charge calculation is missing');
+          if (!app.includes('const candidate={...fresh()') || !app.includes('if(!confirm(') || !app.includes('db=candidate')) throw new Error('Backup restore must validate and confirm before replacing data');
+          if (!app.includes('db.sales.pop();db.parties=previous.parties') || !app.includes('db.purchases.pop();db.products=previous.products')) throw new Error('Invoice writes must roll back if local storage fails');
+          if (!app.includes("a.download='free-bill-transactions-")) throw new Error('CSV export branding is incorrect');
           if (core.includes('Seva Hardware Business Manager')) throw new Error('Legacy backup metadata remains');
           if (manifest.name !== 'Free Bill' || manifest.short_name !== 'Free Bill') throw new Error('Manifest branding is incorrect');
           if (sw.includes('seva-hardware')) throw new Error('Legacy service-worker cache name remains');
