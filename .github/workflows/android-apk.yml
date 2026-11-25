@@ -67,6 +67,8 @@ jobs:
           base64 --decode scripts/apply-data-safety.js.gz.b64 | gzip --decompress > scripts/apply-data-safety.js
           node --check scripts/apply-data-safety.js
           node scripts/apply-data-safety.js
+          node --check scripts/apply-csv-export.js
+          node scripts/apply-csv-export.js
 
       - name: Install Node dependencies
         run: npm install --no-audit --no-fund
