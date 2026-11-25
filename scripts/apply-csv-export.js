@@ -72,10 +72,10 @@ const replacement = `function csv(){
   const out = rows.map(row => row.map(value => '"' + String(value ?? '').replaceAll('"', '""') + '"').join(',')).join('\\n');
   const blob = new Blob([out], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'free-bill-transactions-' + today() + '.csv';
-  link.click();
+  const a = document.createElement('a');
+  a.href = url;
+  a.download='free-bill-transactions-' + today() + '.csv';
+  a.click();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
   toast('Detailed CSV export started. Check Downloads.');
 }`;
