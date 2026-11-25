@@ -69,6 +69,8 @@ jobs:
           node scripts/apply-data-safety.js
           node --check scripts/apply-csv-export.js
           node scripts/apply-csv-export.js
+          node --check scripts/apply-ledger-balance.js
+          node scripts/apply-ledger-balance.js
 
       - name: Install Node dependencies
         run: npm install --no-audit --no-fund
@@ -169,6 +171,7 @@ jobs:
           if (!app.includes('const candidate={...fresh()') || !app.includes('if(!confirm(') || !app.includes('db=candidate')) throw new Error('Backup restore must validate and confirm before replacing data');
           if (!app.includes('db.sales.pop();db.parties=previous.parties') || !app.includes('db.purchases.pop();db.products=previous.products')) throw new Error('Invoice writes must roll back if local storage fails');
           if (!app.includes("a.download='free-bill-transactions-")) throw new Error('CSV export branding is incorrect');
+          if (!core.includes('function partyLedgerRows(party, data)') || !app.includes('Core.partyLedgerRows(p, db)')) throw new Error('Party ledger running-balance logic is missing');
           if (core.includes('Seva Hardware Business Manager')) throw new Error('Legacy backup metadata remains');
           if (manifest.name !== 'Free Bill' || manifest.short_name !== 'Free Bill') throw new Error('Manifest branding is incorrect');
           if (sw.includes('seva-hardware')) throw new Error('Legacy service-worker cache name remains');
