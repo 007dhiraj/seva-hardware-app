@@ -71,6 +71,8 @@ jobs:
           node scripts/apply-csv-export.js
           node --check scripts/apply-ledger-balance.js
           node scripts/apply-ledger-balance.js
+          node --check scripts/apply-monthly-sales.js
+          node scripts/apply-monthly-sales.js
 
       - name: Install Node dependencies
         run: npm install --no-audit --no-fund
@@ -149,7 +151,7 @@ jobs:
           for (const asset of ['style.css', 'manifest.json', 'business-core.js', 'app.js']) {
             if (!html.includes(asset) || !fs.existsSync(`www/${asset}`)) throw new Error(`Missing app asset: ${asset}`);
           }
-          for (const id of ['activeAccountLabel', 'logoutBtn', 'salePaidLabel', 'saleTaxable', 'saveSaleNew', 'currentAccountPin', 'saleCharges', 'saleChargesGst', 'saleChargesNote', 'purchaseDiscType', 'purchaseDisc', 'purchaseCharges', 'purchaseChargesGst', 'purchaseChargesNote', 'purchaseDue']) {
+          for (const id of ['activeAccountLabel', 'monthSales', 'monthSalesTrend', 'logoutBtn', 'salePaidLabel', 'saleTaxable', 'saveSaleNew', 'currentAccountPin', 'saleCharges', 'saleChargesGst', 'saleChargesNote', 'purchaseDiscType', 'purchaseDisc', 'purchaseCharges', 'purchaseChargesGst', 'purchaseChargesNote', 'purchaseDue']) {
             if (!html.includes(`id="${id}"`)) throw new Error(`Missing required UI element: ${id}`);
           }
           const app = fs.readFileSync('www/app.js', 'utf8');
@@ -172,6 +174,7 @@ jobs:
           if (!app.includes('db.sales.pop();db.parties=previous.parties') || !app.includes('db.purchases.pop();db.products=previous.products')) throw new Error('Invoice writes must roll back if local storage fails');
           if (!app.includes("a.download='free-bill-transactions-")) throw new Error('CSV export branding is incorrect');
           if (!core.includes('function partyLedgerRows(party, data)') || !app.includes('Core.partyLedgerRows(p, db)')) throw new Error('Party ledger running-balance logic is missing');
+          if (!core.includes('function monthlySalesComparison(') || !app.includes('Core.monthlySalesComparison(db.sales,today())')) throw new Error('Current-month sales comparison is missing');
           if (core.includes('Seva Hardware Business Manager')) throw new Error('Legacy backup metadata remains');
           if (manifest.name !== 'Free Bill' || manifest.short_name !== 'Free Bill') throw new Error('Manifest branding is incorrect');
           if (sw.includes('seva-hardware')) throw new Error('Legacy service-worker cache name remains');

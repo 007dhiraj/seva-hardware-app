@@ -12,7 +12,7 @@
 7. Free Bill खोलकर अपना mobile number और local PIN बनाएं।
 
 ## इस offline build की सुविधाएँ
-Sales cash/credit/return invoices, sales और purchase discounts, hamali/delivery/packaging/other additional charges (अलग GST rate के साथ), purchase entries, product/inventory, customer/supplier records, party ledgers, receipts/payments, expenses, basic reports, detailed CSV export, JSON backup/restore और Android back navigation।
+Sales cash/credit/return invoices, sales और purchase discounts, hamali/delivery/packaging/other additional charges (अलग GST rate के साथ), purchase entries, product/inventory, customer/supplier records, party ledgers, receipts/payments, expenses, dashboard current-month net sales और पिछले महीने से percentage change, basic reports, detailed CSV export, JSON backup/restore और Android back navigation।
 
 ## Backup और restore
 More → Settings & Backup → Download full backup चुनें। Android share sheet से JSON backup को Files/Drive में सुरक्षित रखें। Restore backup में JSON file चुनें; restore मौजूदा account data replace करता है। Phone बदलने, app update करने या uninstall करने से पहले backup लें।

@@ -9,7 +9,7 @@ This repository builds a **debug-signed APK for direct Android installation**. I
 - Purchase entries with amount/percentage discounts, optional additional charges and a separately entered GST rate; supplier records and stock updates (new purchased products are added to the product list).
 - Product master with unit, HSN, opening stock, low-stock level, sale/purchase rates and editable GST percentage.
 - Customer/supplier records, party ledgers, receipts and payments.
-- Expenses, dashboard and basic period reports; CSV export.
+- Expenses, dashboard with current-month net sales and percentage change vs the previous month, basic period reports; CSV export.
 - JSON backup and restore. Restore validates the backup type/account, asks for confirmation before replacing data, and leaves current records unchanged if cancelled or if storage rejects the write. Backup metadata intentionally excludes the local account PIN.
 - CSV export includes subtotal, discount, taxable value, additional charges, charge GST, total GST, total and paid amount.
 - Android back navigation through the in-app page history.
