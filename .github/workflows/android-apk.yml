@@ -73,6 +73,8 @@ jobs:
           node scripts/apply-ledger-balance.js
           node --check scripts/apply-monthly-sales.js
           node scripts/apply-monthly-sales.js
+          node --check scripts/apply-build-info.js
+          node scripts/apply-build-info.js
 
       - name: Install Node dependencies
         run: npm install --no-audit --no-fund
@@ -151,9 +153,10 @@ jobs:
           for (const asset of ['style.css', 'manifest.json', 'business-core.js', 'app.js']) {
             if (!html.includes(asset) || !fs.existsSync(`www/${asset}`)) throw new Error(`Missing app asset: ${asset}`);
           }
-          for (const id of ['activeAccountLabel', 'monthSales', 'monthSalesTrend', 'logoutBtn', 'salePaidLabel', 'saleTaxable', 'saveSaleNew', 'currentAccountPin', 'saleCharges', 'saleChargesGst', 'saleChargesNote', 'purchaseDiscType', 'purchaseDisc', 'purchaseCharges', 'purchaseChargesGst', 'purchaseChargesNote', 'purchaseDue']) {
+          for (const id of ['activeAccountLabel', 'buildInfo', 'monthSales', 'monthSalesTrend', 'logoutBtn', 'salePaidLabel', 'saleTaxable', 'saveSaleNew', 'currentAccountPin', 'saleCharges', 'saleChargesGst', 'saleChargesNote', 'purchaseDiscType', 'purchaseDisc', 'purchaseCharges', 'purchaseChargesGst', 'purchaseChargesNote', 'purchaseDue']) {
             if (!html.includes(`id="${id}"`)) throw new Error(`Missing required UI element: ${id}`);
           }
+          if (!html.includes('Build information') || !html.includes('CI run #')) throw new Error('Visible build identity is missing');
           const app = fs.readFileSync('www/app.js', 'utf8');
           const core = fs.readFileSync('www/business-core.js', 'utf8');
           const manifest = JSON.parse(fs.readFileSync('www/manifest.json', 'utf8'));
@@ -192,10 +195,13 @@ jobs:
           chmod +x gradlew
           ./gradlew --no-daemon --stacktrace assembleDebug
 
+      - name: Name direct-install APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk Free-Bill-Android.apk
+
       - name: Verify APK package, signature and checksum
         run: |
           set -euo pipefail
-          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          APK=Free-Bill-Android.apk
           test -s "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.sevahardware.businessmanager'"
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
@@ -208,7 +214,7 @@ jobs:
           set -euo pipefail
           AVD=freebill-ci
           SERIAL=emulator-5554
-          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          APK=Free-Bill-Android.apk
           PKG=com.sevahardware.businessmanager
           IMAGE="system-images;android-30;google_apis;x86_64"
           EMULATOR_LOG="$RUNNER_TEMP/freebill-emulator.log"
@@ -291,6 +297,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Free-Bill-Android-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: Free-Bill-Android.apk
           if-no-files-found: error
           retention-days: 30
