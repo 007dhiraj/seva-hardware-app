@@ -22,12 +22,11 @@ The app's web source and Node tests are stored as a compressed source bundle in 
 2. Open **Build Free Bill installable APK**.
 3. Select **Run workflow** (or wait for the build after a commit).
 4. Wait until the run is green. The workflow runs Node business-logic tests, builds the APK, checks its Android package ID, installs and launches it on an Android emulator, then uploads the APK artifact.
-5. Open the successful run, scroll to **Artifacts**, and download **Free-Bill-Android-APK**. Extract the ZIP; the install file is named `Free-Bill-Android.apk`.
-6. Extract the downloaded ZIP on your Android phone, tap `app-debug.apk`, and allow **Install unknown apps** for the app (Chrome or Files) if Android asks.
+5. Open the successful run, scroll to **Artifacts**, and download **Free-Bill-Android-APK**.
+6. Extract the ZIP on your Android phone, tap `Free-Bill-Android.apk`, and allow **Install unknown apps** for Files or Chrome if Android asks.
 7. Open **Free Bill**, create a local account with your mobile number and a 4–6 digit PIN, and keep that PIN private.
 
-Open **More → Settings & Backup → Build information** to see the CI run number, source commit and build time; compare these when checking whether an APK is outdated. The APK is named `Free-Bill-Android.apk` and is debug-signed for direct testing/installation. It is not a Play Store release. If a previous version is already installed with a different signing key, Android may require uninstalling that old version first; uninstalling removes its local app data, so export a backup first.
-
+Open **More → Settings & Backup → Build information** to see the CI run number, source commit and build time; compare these when checking whether an APK is outdated. The APK is debug-signed for direct testing/installation, not a Play Store release. If a previous version is installed with a different signing key, Android may require uninstalling it first; uninstalling removes local app data, so export a backup before doing so.
 ## Backup and restore
 
 - Open **More → Backup & Restore** (Settings & Backup) or use the **Backup** button in the top bar.
