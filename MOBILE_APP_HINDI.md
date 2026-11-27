@@ -11,7 +11,7 @@
 6. ZIP extract करके `Free-Bill-Android.apk` पर tap करें। Android पूछे तो Files/Chrome के लिए **Install unknown apps** अनुमति दें।
 7. Free Bill खोलकर अपना mobile number और local PIN बनाएं।
 
-Settings & Backup में **Build information** के अंदर CI run number, source commit और build time दिखता है। APK की पहचान करने के लिए इसे latest successful GitHub Actions run से मिलाएँ।\n\nSettings & Backup में **Build information** के अंदर CI run number, source commit और build time दिखता है। APK की पहचान करने के लिए इसे latest successful GitHub Actions run से मिलाएँ।
+Settings & Backup में **Build information** के अंदर CI run number, source commit और build time दिखता है। APK की पहचान करने के लिए इसे latest successful GitHub Actions run से मिलाएँ।
 
 ## इस offline build की सुविधाएँ
 Sales cash/credit/return invoices, sales और purchase discounts, hamali/delivery/packaging/other additional charges (अलग GST rate के साथ), purchase entries, product/inventory, customer/supplier records, party ledgers, receipts/payments, expenses, dashboard current-month net sales और पिछले महीने से percentage change, basic reports, detailed CSV export, JSON backup/restore और Android back navigation।
