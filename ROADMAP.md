@@ -4,7 +4,7 @@
 Stabilize the existing Android demo and address outdated-build confusion before adding more features.
 
 ## Milestones
-1. **Reproducible build** — verify repository source, workflow, artifact naming, version/build stamp.
+1. **Reproducible build** — verify repository source, workflow, artifact naming, visible CI run/commit/build-time stamp (implemented).
 2. **QA fixes** — run business-logic tests and emulator smoke tests; fix regressions.
 3. **Core billing polish** — GST/non-GST mode, discounts, additional charges, invoice/ledger sharing, item/customer search and usability.
 4. **Security & data** — salted PBKDF2 local PIN hashing + legacy migration (implemented); OTP, business-data encryption, cloud sync and tenant isolation remain planned.
